@@ -1,0 +1,10 @@
+pblib
+=====
+
+This library contains a few basic components used to create media oriented applications. Included are:
+ * a video player
+ * a music player
+ * a gallery component
+ * some basic things to help with UIs
+
+The current source is simply a dump of code written for a previous project, so expect lots of hacks, hard coded values and code that seems like it was written by a caffiene dosed non smoker after finishing a packet of 20s and having a full 8 hours sleep for the week :)

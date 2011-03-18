@@ -1,0 +1,13 @@
+-swf lib.swf
+-swf-version 9
+-debug
+-cp src
+Page
+PageHandler
+ui.Layout
+ui.VerticalLayout
+ui.HorizontalLayout
+ui.ListView
+ui.ListViewItem
+ui.ListViewEvent
+ui.TButton
