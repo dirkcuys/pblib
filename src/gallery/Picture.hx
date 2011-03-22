@@ -4,10 +4,12 @@ class Picture extends flash.display.Sprite
 {
 	public var bitmap : flash.display.Bitmap;
 	public var frame : flash.display.Shape;
-	public var frameSize : Float;
-	public var whiteLine : flash.display.Shape;
 	public var middleX(default,setMiddleX) : Float;
 	public var middleY(default,setMiddleY) : Float;
+	
+	private var frameSize : Float;
+	private var whiteLine : flash.display.Shape;
+	
 	public function new(bitmap : flash.display.Bitmap)
 	{
 		super();
