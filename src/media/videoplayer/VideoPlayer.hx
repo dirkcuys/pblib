@@ -31,7 +31,7 @@ class VideoPlayer extends flash.display.Sprite
 	private var m_stopButton : flash.display.Sprite;
 	private var m_closeButton : flash.display.Sprite;
 	private var m_title : ui.TLabel;
-	private var m_progressBar : ProgressBar;
+	private var m_progressBar : ProgressSlider;
 	private var m_progressTimer : flash.utils.Timer;
 	
 	public var duration : Float;
@@ -109,7 +109,7 @@ class VideoPlayer extends flash.display.Sprite
 		m_stopButton.addEventListener(flash.events.MouseEvent.CLICK, stopListener);
 		addChild(m_stopButton);
 
-		m_progressBar = new ProgressBar( width - (m_stopButton.x + m_stopButton.width + 20));
+		m_progressBar = new ProgressSlider( width - (m_stopButton.x + m_stopButton.width + 20));
 		m_progressBar.y = sizeY + 45;
 		m_progressBar.x = m_stopButton.x + m_stopButton.width + 10;
 		m_progressBar.addEventListener(flash.events.Event.CHANGE, skipListener);

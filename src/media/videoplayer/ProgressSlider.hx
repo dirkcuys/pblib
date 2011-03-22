@@ -13,7 +13,7 @@ class ProgressButton extends flash.display.Sprite
 	}
 }
 
-class ProgressBar extends flash.display.Sprite
+class ProgressSlider extends flash.display.Sprite
 {
 
 	private var m_slider : ProgressButton;
