@@ -3,14 +3,13 @@ package gallery;
 class Gallery extends flash.display.Sprite
 {
 	private var m_background : flash.display.Shape;
-	private var m_darkBackground : flash.display.Shape;
+	private var m_darkBackground : flash.display.Sprite;
 	private var m_mouseX : Float;
 
 	private var m_thumbs : Array<gallery.Thumb>;
 	private var m_tolerance : Float;
 
-	public var thumbWidth : Float;
-	public var thumbHeight : Float;
+	public var thumbSize : Float; /// max width or height
 	
 	public var stageWidth : Float;
 	public var stageHeight : Float;
@@ -21,8 +20,7 @@ class Gallery extends flash.display.Sprite
 		m_tolerance = 0;
 		m_thumbs = new Array<gallery.Thumb>();	
 		
-		thumbWidth = 100;
-		thumbHeight = 100;
+		thumbSize = 100;
 
 		stageWidth = 1024;
 		stageHeight = 768;
@@ -33,42 +31,62 @@ class Gallery extends flash.display.Sprite
 		m_background.y = 384;
 		addChild(m_background);
 
-		m_darkBackground = new flash.display.Shape();
-		m_darkBackground.graphics.beginFill(0x000000, 0.1);
+		m_darkBackground = new flash.display.Sprite();
+		m_darkBackground.graphics.beginFill(0x000000, 0.8);
 		m_darkBackground.graphics.drawRect(0, 0, stageWidth, stageHeight);
-		m_darkBackground.alpha = 0.0;
-		addChild(m_darkBackground);
 
 		addEventListener(flash.events.MouseEvent.MOUSE_MOVE, trackMouse);
 	}
 
+	/// create a thumbnail
 	public function loadPicture(thumbURL : String, pictureURL : String)
 	{
-		var thumb = new gallery.Thumb(thumbURL, pictureURL, thumbWidth, thumbHeight);
+		var thumb = new gallery.Thumb(thumbURL, pictureURL, thumbSize);
 		m_thumbs.push(thumb);
 		addChild(thumb);
+		thumb.addEventListener(flash.events.MouseEvent.MOUSE_UP, thumbClickListener);
 		placeBoxes();
 	}
 
-	public function pictureMaximizeListener(event : flash.events.MouseEvent)
+	/// open full size image when the user clicks on the thumb
+	public function thumbClickListener(event : flash.events.MouseEvent)
 	{
 		m_tolerance = 10;
-		var holder : gallery.Picture = event.target;
-		//removeEventListener(flash.events.MouseEvent.MOUSE_MOVE, trackMouse);
-		//holder.scaleX = holder.scaleY = 1.0/holder.bitmap.scaleY;
-		//holder.frame.alpha = 0.0;
-		m_darkBackground.alpha = 1.0;
-		holder.x = stageWidth/2.0 - holder.width/2.0;
-		holder.y = stageHeight/2.0 - holder.height/2.0;
-		swapChildren(m_darkBackground, getChildAt(numChildren-2));
-		swapChildren(holder, getChildAt(numChildren-1));
+		var thumb : gallery.Thumb = event.target;
+		removeEventListener(flash.events.MouseEvent.MOUSE_MOVE, trackMouse);
+		
+		var picture = new gallery.Picture(thumb.pictureURL, stageWidth/2.0);
+		picture.x = stageWidth/2.0 - picture.width/2.0;
+		picture.y = stageHeight/2.0 - picture.height/2.0;
+		picture.addEventListener(flash.events.MouseEvent.MOUSE_UP, pictureClickListener);
+		picture.addEventListener(flash.events.Event.COMPLETE, pictureFinishedLoad);
+		
+		addChild(m_darkBackground);
+		addChild(picture);
+	}
+	
+	/// called once picture is completely loaded to position picture properly
+	public function pictureFinishedLoad(event : flash.events.Event)
+	{
+		var picture : gallery.Picture = event.target;
+		picture.x = stageWidth/2.0 - picture.width/2.0;
+		picture.y = stageHeight/2.0 - picture.height/2.0;
+		picture.removeEventListener(flash.events.Event.COMPLETE, pictureFinishedLoad);
+	}
+	
+	/// close picture when the user clicks on the image
+	public function pictureClickListener(event : flash.events.MouseEvent)
+	{
+		var picture : gallery.Picture = event.target;
+		removeChild(picture);
+		removeChild(m_darkBackground);
+		picture.removeEventListener(flash.events.MouseEvent.MOUSE_UP, pictureClickListener);
+		addEventListener(flash.events.MouseEvent.MOUSE_MOVE, trackMouse);
 	}
 
 	/// calculate position and scale for thumbnails
 	public function placeBoxes()
-	{
-		//m_darkBackground.alpha = 0.0;
-		
+	{	
 		// calculate the total width
 		var totalWidth : Float = 0;
 		for (box in m_thumbs.iterator())

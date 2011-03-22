@@ -1,59 +1,50 @@
 package gallery;
 
+import aux.ProgressBar;
+
+/// loads a picture from an URL and adds the picture as child
 class Picture extends flash.display.Sprite
 {
-	public var bitmap : flash.display.Bitmap;
-	public var frame : flash.display.Shape;
-	public var middleX(default,setMiddleX) : Float;
-	public var middleY(default,setMiddleY) : Float;
+	private var pictureURL : String;
+	private var progressBar : aux.ProgressBar;
+	private var widthHint : Float; /// width used for progress bar
 	
-	private var frameSize : Float;
-	private var whiteLine : flash.display.Shape;
-	
-	public function new(bitmap : flash.display.Bitmap)
+	public function new(pictureURL : String, widthHint : Float)
 	{
 		super();
-		this.bitmap = bitmap;
-
-		frameSize = 5;
+		this.pictureURL = pictureURL;
+		this.widthHint = widthHint;
+		
 		initialize();
 	}
 
 	private function initialize()
 	{	
-		frame = new flash.display.Shape();
-		frame.graphics.beginFill(0x222222, 1.0);
-		frame.graphics.drawRoundRect(0, 0, bitmap.width + frameSize*2, bitmap.height + frameSize*2, frameSize);
-		addChild(frame);
-		
-		bitmap.smoothing = true;
-		bitmap.x = bitmap.y = frameSize;
-		addChild(bitmap);
-
-		var padding = bitmap.scaleX;
-
-		whiteLine = new flash.display.Shape();
-		//whiteLine.graphics.beginFill(0xFFFFFF, 1.0);
-		whiteLine.graphics.lineStyle(bitmap.scaleX, 0xFFFFFF);
-		whiteLine.graphics.drawRect(bitmap.x + padding, bitmap.y + padding, bitmap.width - 2*padding, bitmap.height - 2*padding);
-		addChild(whiteLine);
-
 		useHandCursor = true;
 		buttonMode = true;
 		mouseChildren = false;
+		
+		var loader = new flash.display.Loader();
+		loader.contentLoaderInfo.addEventListener(flash.events.Event.COMPLETE, loadComplete);
+		loader.load(new flash.net.URLRequest(pictureURL));
+		
+		progressBar = new aux.ProgressBar(widthHint);
+		addChild(progressBar);
+		loader.contentLoaderInfo.addEventListener(flash.events.ProgressEvent.PROGRESS, loadProgress);
 	}
 
-	public function setMiddleX(mx : Float) : Float
+	private function loadComplete(event : flash.events.Event)
 	{
-		middleX = mx;
-		x = middleX - width/2.0;
-		return middleX;
+		removeChild(progressBar);
+		var loader = event.target;
+		var picture : flash.display.Bitmap = loader.content;
+		picture.smoothing = true;			
+		addChild(picture);
+		dispatchEvent(new flash.events.Event(flash.events.Event.COMPLETE));
 	}
-
-	public function setMiddleY(my : Float) : Float
+	
+	private function loadProgress(event : flash.events.ProgressEvent)
 	{
-		middleY = my;
-		y = middleY - height/2.0;
-		return middleY;
+		progressBar.progress = event.target.bytesLoaded/event.target.bytesTotal*100.0;
 	}
 }
